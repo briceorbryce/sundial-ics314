@@ -37,7 +37,7 @@ import java.awt.Graphics2D;
 /**
  * Sundial GUI main class. Draws out the sundial ONLY AFTER input has been
  * validated.
- * f
+ * 
  * @author Amy
  * @author Reginald
  * @author briceorbryce
