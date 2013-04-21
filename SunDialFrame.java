@@ -363,11 +363,24 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	 * 
 	 * @param evt User hits search
 	 */
+	@SuppressWarnings("nls")
 	private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {
+		
 		// TODO error checking on months and days
-		// TODO calculations here
-		// TODO Check to make sure all text fields are not empty
 		// TODO Make sure month and day are not selected
+		
+		// TODO Should put this in its own method
+		// TODO get rid of system out println and put msg window
+		if (this.jTextFieldLatitude.getText().isEmpty() ||
+				this.jTextFieldLongitude.getText().isEmpty() || 
+				this.jComboBoxMonth.getSelectedItem().equals("Month") ||
+				this.jComboBoxDay.getSelectedItem().equals("Day")) {
+			System.out.println("error");
+		}
+		
+		
+		// TODO calculations here
+		
 		
 		this.draw();
 	}
