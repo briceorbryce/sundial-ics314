@@ -368,25 +368,29 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	@SuppressWarnings("nls")
 	private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {
 		
-		// TODO error checking on months and days
-		// TODO Make sure month and day are not selected
+		// TODO call checkValidMonthsAndDays method here
 		
 		if (userError()) {
-			JOptionPane.showMessageDialog(null, "Error", null, JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Invalid input", null, JOptionPane.ERROR_MESSAGE);
 		}
 		else {
-
-			// TODO calculations here
 			
+			// TODO call calculations method here
 			
+			// If calculations are all correct or something,
+			// draw time!
 			this.draw();
 		}
 	}
 	
+	// TODO Error checking months and days method
+	// checkValidMonthsAndDays
+	
 	/**
+	 * Checks if any of the text fields or combo boxes are empty or they haven't been
+	 * changed.
 	 * 
-	 * 
-	 * @return false if text fields are empty
+	 * @return false if text fields are empty or combo boxes unchanged
 	 */
 	public boolean userError() {
 		return this.jTextFieldLatitude.getText().isEmpty() ||
@@ -394,6 +398,8 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 				this.jComboBoxMonth.getSelectedItem().equals("Month") || //$NON-NLS-1$
 				this.jComboBoxDay.getSelectedItem().equals("Day"); //$NON-NLS-1$
 	}
+	
+	// calculations method TODO
 	
 	/**
 	 * Draws out the sundial.
