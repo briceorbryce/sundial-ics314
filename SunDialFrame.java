@@ -39,6 +39,8 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 
+import javax.swing.JOptionPane;
+
 /**
  * Sundial GUI main class. Draws out the sundial ONLY AFTER input has been
  * validated.
@@ -56,9 +58,9 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	/**Longitude*/
 	private double longitude;
 	/**Tooltip string*/
-	private final String popupLat = "Degrees-Minutes-Seconds"; //$NON-NLS-1$
+	private static final String popupLat = "Degrees-Minutes-Seconds"; //$NON-NLS-1$
 	/**Tooltip string*/
-	private final String format = "Format: [Degrees][Minutes][Seconds]"; //$NON-NLS-1$
+	private static final String format = "Format: [Degrees][Minutes][Seconds]"; //$NON-NLS-1$
 
 	/**
 	 * Creates new form SunDialFrame
@@ -103,7 +105,7 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 
 		this.jPanelInfo.setBackground(java.awt.Color.orange);
 
-		this.jComboBoxFractionOrDegArcSec.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Fractional Degrees", this.popupLat })); //$NON-NLS-1$
+		this.jComboBoxFractionOrDegArcSec.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Fractional Degrees", SunDialFrame.popupLat })); //$NON-NLS-1$
 		this.jComboBoxFractionOrDegArcSec.setPreferredSize(new java.awt.Dimension(185, 20));
 
 		this.jLabelLongitude.setText("Longitude:"); //$NON-NLS-1$
@@ -283,8 +285,8 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	 * @param evt enters textbox
 	 */
 	public void tooltiplatitudeEnter(java.awt.event.MouseEvent evt) {
-		if (this.jComboBoxFractionOrDegArcSec.getSelectedItem().equals(this.popupLat)) {
-			this.jTextFieldLatitude.setToolTipText(this.format);
+		if (this.jComboBoxFractionOrDegArcSec.getSelectedItem().equals(SunDialFrame.popupLat)) {
+			this.jTextFieldLatitude.setToolTipText(SunDialFrame.format);
 		}
 	}
 
@@ -294,7 +296,7 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	 * @param evt exits textbox
 	 */
 	public void tooltipLatExit(java.awt.event.MouseEvent evt) {
-		if (this.jComboBoxFractionOrDegArcSec.getSelectedItem().equals(this.popupLat)) {
+		if (this.jComboBoxFractionOrDegArcSec.getSelectedItem().equals(SunDialFrame.popupLat)) {
 			this.jTextFieldLatitude.setToolTipText(null);
 		}
 	}
@@ -342,8 +344,8 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	 * @param evt enters textbox
 	 */
 	public void tooltipLongEnter(java.awt.event.MouseEvent evt) {
-		if (this.jComboBoxFractionOrDegArcSec.getSelectedItem().equals(this.popupLat)) {
-			this.jTextFieldLongitude.setToolTipText(this.format);
+		if (this.jComboBoxFractionOrDegArcSec.getSelectedItem().equals(SunDialFrame.popupLat)) {
+			this.jTextFieldLongitude.setToolTipText(SunDialFrame.format);
 		}
 	}
 
@@ -353,7 +355,7 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	 * @param evt leaves textbox
 	 */
 	public void tooltipLongExit(java.awt.event.MouseEvent evt) {
-		if (this.jComboBoxFractionOrDegArcSec.getSelectedItem().equals(this.popupLat)) {
+		if (this.jComboBoxFractionOrDegArcSec.getSelectedItem().equals(SunDialFrame.popupLat)) {
 			this.jTextFieldLongitude.setToolTipText(null);
 		}
 	}
@@ -369,20 +371,28 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 		// TODO error checking on months and days
 		// TODO Make sure month and day are not selected
 		
-		// TODO Should put this in its own method
-		// TODO get rid of system out println and put msg window
-		if (this.jTextFieldLatitude.getText().isEmpty() ||
-				this.jTextFieldLongitude.getText().isEmpty() || 
-				this.jComboBoxMonth.getSelectedItem().equals("Month") ||
-				this.jComboBoxDay.getSelectedItem().equals("Day")) {
-			System.out.println("error");
+		if (userError()) {
+			JOptionPane.showMessageDialog(null, "Error", null, JOptionPane.ERROR_MESSAGE);
 		}
-		
-		
-		// TODO calculations here
-		
-		
-		this.draw();
+		else {
+
+			// TODO calculations here
+			
+			
+			this.draw();
+		}
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return false if text fields are empty
+	 */
+	public boolean userError() {
+		return this.jTextFieldLatitude.getText().isEmpty() ||
+				this.jTextFieldLongitude.getText().isEmpty() || 
+				this.jComboBoxMonth.getSelectedItem().equals("Month") || //$NON-NLS-1$
+				this.jComboBoxDay.getSelectedItem().equals("Day"); //$NON-NLS-1$
 	}
 	
 	/**
