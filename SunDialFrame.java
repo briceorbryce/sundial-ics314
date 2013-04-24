@@ -383,7 +383,7 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	
 	/**
 	 * Checks if any of the text fields or combo boxes are empty or they haven't been
-	 * changed.
+	 * changed. Also checks if user enters Feb and 30, for example.
 	 * 
 	 * @return false if text fields are empty or combo boxes unchanged
 	 */
@@ -391,7 +391,35 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 		return this.jTextFieldLatitude.getText().isEmpty() ||
 				this.jTextFieldLongitude.getText().isEmpty() || 
 				this.jComboBoxMonth.getSelectedItem().equals("Month") || //$NON-NLS-1$
-				this.jComboBoxDay.getSelectedItem().equals("Day"); //$NON-NLS-1$
+				this.jComboBoxDay.getSelectedItem().equals("Day") || //$NON-NLS-1$
+				checkValidMonthsAndDays();
+	}
+	
+	/**
+	 * Checks to make sure the user chooses a month with a valid day. <br />
+	 * Ignoring leap year, Feb 29.
+	 * Jan 31
+	 * Feb 28
+	 * March 31 
+	 * April 30
+	 * May 31
+	 * June 30
+	 * July 31
+	 * Aug 31
+	 * Sept 30
+	 * Oct 31
+	 * Nov 30
+	 * Dec 31
+	 * 
+	 * @return month with a valid day
+	 */
+	private boolean checkValidMonthsAndDays() {
+		
+		String t = this.jComboBoxMonth.getSelectedItem().toString();
+		int u = Integer.parseInt(this.jComboBoxDay.getSelectedItem().toString());
+		System.out.println(t);
+		System.out.println(u);
+		return false;
 	}
 	
 	// calculations method TODO
