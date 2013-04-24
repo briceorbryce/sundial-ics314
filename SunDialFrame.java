@@ -53,10 +53,6 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	/**SerialVersionUID*/
 	private static final long serialVersionUID = 1L;
 
-	/**Latitude*/
-	private double latitude;
-	/**Longitude*/
-	private double longitude;
 	/**Tooltip string*/
 	private static final String popupLat = "Degrees-Minutes-Seconds"; //$NON-NLS-1$
 	/**Tooltip string*/
@@ -365,13 +361,12 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	 * 
 	 * @param evt User hits search
 	 */
-	@SuppressWarnings("nls")
 	private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {
 		
 		// TODO call checkValidMonthsAndDays method here
 		
 		if (userError()) {
-			JOptionPane.showMessageDialog(null, "Invalid input", null, JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Invalid input", null, JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 		}
 		else {
 			
