@@ -430,7 +430,47 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	 */
 	private void draw() {
 		Graphics2D gfx = (Graphics2D) this.jPanelSundial.getGraphics();
-		gfx.drawLine(0, 0, 100, 100);
+		/*draw sundial lines*/
+		gfx.drawLine(0, 330, 736, 330);//6AM,6PM
+		gfx.drawLine(0,231,368,330);//7AM
+		gfx.drawLine(0, 118, 368, 330);//8AM
+		gfx.drawLine(0, -38, 368, 330);//9AM
+		gfx.drawLine(177, 0, 368, 330);//10AM
+		gfx.drawLine(280, 0, 368, 330);//11AM
+		gfx.drawLine(368, 0, 368, 330);//12PM
+		gfx.drawLine(456, 0, 368, 330);//1PM
+		gfx.drawLine(558, 0, 368, 330);//2PM
+		gfx.drawLine(736, -38, 368, 330);//3PM
+		gfx.drawLine(736, 118, 368, 330);//4PM
+		gfx.drawLine(736, 231, 368, 330);//5PM
+		
+		/*label sundial lines*/
+		gfx.drawString("6 AM", 2, 328);
+		gfx.drawString("7 AM", 2, 229);
+		gfx.drawString("8 AM", 2, 116);
+		gfx.drawString("9 AM", 58, 13);
+		gfx.drawString("10 AM", 186, 13);
+		gfx.drawString("11 AM", 287, 13);
+		gfx.drawString("12 PM", 370, 13);
+		gfx.drawString("1 PM", 458, 13);
+		gfx.drawString("2 PM", 560, 13);
+		gfx.drawString("3 PM", 705, 13);
+		gfx.drawString("4 PM", 705, 116);
+		gfx.drawString("5 PM", 705, 229);
+		gfx.drawString("6 PM", 705, 328);
+		
+		/*draw gnomon shadow*/
+		int[]xPoints = new int[4];
+		int[]yPoints = new int[4];
+		xPoints[0]= 368;
+		xPoints[1]= 368;
+		xPoints[2]= 558;
+		//xPoints[3]=
+		yPoints[0]= 330;
+		yPoints[1]= 0;
+		yPoints[2]= 0;
+		//yPoints[3]=
+		gfx.fillPolygon(xPoints,yPoints,3);
 	}
 
 	/**
