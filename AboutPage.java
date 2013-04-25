@@ -82,7 +82,7 @@ public class AboutPage extends javax.swing.JDialog {
 
 		this.jPanelAll.setBackground(new java.awt.Color(0, 0, 255));
 
-		this.jLabelAbout.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N //$NON-NLS-1$
+		this.jLabelAbout.setFont(new java.awt.Font("Tahoma", 1, 24)); //$NON-NLS-1$
 		this.jLabelAbout.setForeground(new java.awt.Color(240, 240, 240));
 		this.jLabelAbout.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		this.jLabelAbout.setText("About"); //$NON-NLS-1$
