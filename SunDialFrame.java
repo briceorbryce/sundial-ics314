@@ -33,17 +33,18 @@
 package sundial;
 
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
-
 import javax.swing.JOptionPane;
 
 /**
  * Sundial GUI main class. Draws out the sundial ONLY AFTER input has been
  * validated.
+ * 
+ * North and South Pole JRadio buttons won't click off, unless there's an
+ * invisible, 3rd JRadio button.
  * 
  * @author Amy
  * @author Reginald
@@ -58,6 +59,22 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	/**Tooltip string*/
 	private static final String format = "Format: [Degrees][Minutes][Seconds]"; //$NON-NLS-1$
 
+    /*
+     * These JPanels have been extended to do more than just repaint the panel
+     * after the user hovers over or clicks the tab.
+     */
+	/**JPanel extension for the gnomon image.*/
+    private JPanelBExt gnomon;
+    /**JPanel extension for the sundial image.*/
+    private JPanelBExt sundial;
+    
+    /*
+     * These handle the calculations (X,Y points) for the gnomon and the gnomon
+     * and the sundial. 
+     */
+    // Amy's awesome stuff geos hear
+    
+    
 	/**
 	 * Creates new form SunDialFrame
 	 */
@@ -77,192 +94,230 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	 */
 	private void initComponents() {
 
-		this.jPanelInfo = new javax.swing.JPanel();
-		this.jComboBoxFractionOrDegArcSec = new javax.swing.JComboBox();
-		this.jLabelLongitude = new javax.swing.JLabel();
-		this.jLabelLatitude = new javax.swing.JLabel();
-		this.jLabelLongDeg = new javax.swing.JLabel();
-		this.jTextFieldLongitude = new javax.swing.JTextField();
-		this.jTextFieldLatitude = new javax.swing.JTextField();
-		this.jLabelDate = new javax.swing.JLabel();
-		this.jLabelLatiDeg = new javax.swing.JLabel();
-		this.jComboBoxMonth = new javax.swing.JComboBox();
-		this.jComboBoxDay = new javax.swing.JComboBox();
-		this.jButtonSearch = new javax.swing.JButton();
-		this.jPanelSundial = new javax.swing.JPanel();
-		this.jMenuBar = new javax.swing.JMenuBar();
-		this.jMenuFile = new javax.swing.JMenu();
-		this.jMenuItemPrint = new javax.swing.JMenuItem();
-		this.jMenuHelp = new javax.swing.JMenu();
-		this.jMenuItemAbout = new javax.swing.JMenuItem();
+		this.buttonGroupHemisphere = new javax.swing.ButtonGroup();
+        this.buttonGroupPole = new javax.swing.ButtonGroup();
+        this.jPanelInfo = new javax.swing.JPanel();
+        this.jComboBoxFractionOrDegArcSec = new javax.swing.JComboBox();
+        this.jLabelLongitude = new javax.swing.JLabel();
+        this.jLabelLatitude = new javax.swing.JLabel();
+        this.jLabelLongDeg = new javax.swing.JLabel();
+        this.jTextFieldLongitude = new javax.swing.JTextField();
+        this.jTextFieldLatitude = new javax.swing.JTextField();
+        this.jLabelDate = new javax.swing.JLabel();
+        this.jLabelLatiDeg = new javax.swing.JLabel();
+        this.jComboBoxMonth = new javax.swing.JComboBox();
+        this.jComboBoxDay = new javax.swing.JComboBox();
+        this.jButtonSearch = new javax.swing.JButton();
+        this.jCheckBoxDST = new javax.swing.JCheckBox();
+        this.jCheckBoxEquator = new javax.swing.JCheckBox();
+        this.jRadioButtonNorthHemi = new javax.swing.JRadioButton();
+        this.jRadioButtonSouthHemi = new javax.swing.JRadioButton();
+        this.jRadioButtonNPole = new javax.swing.JRadioButton();
+        this.jRadioButtonSPole = new javax.swing.JRadioButton();
+        this.jTabbedPaneDialGno = new javax.swing.JTabbedPane();
+        this.jMenuBar = new javax.swing.JMenuBar();
+        this.jMenuFile = new javax.swing.JMenu();
+        this.jMenuItemPrint = new javax.swing.JMenuItem();
+        this.jMenuHelp = new javax.swing.JMenu();
+        this.jMenuItemAbout = new javax.swing.JMenuItem();
 
-		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-		setResizable(false);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
 
-		this.jPanelInfo.setBackground(java.awt.Color.orange);
+        this.jPanelInfo.setBackground(java.awt.Color.orange);
 
-		this.jComboBoxFractionOrDegArcSec.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Fractional Degrees", SunDialFrame.popupLat })); //$NON-NLS-1$
-		this.jComboBoxFractionOrDegArcSec.setPreferredSize(new java.awt.Dimension(185, 20));
+        this.jComboBoxFractionOrDegArcSec.setModel(new javax.swing.DefaultComboBoxModel(new String[] {  "Fractional Degrees", SunDialFrame.popupLat })); //$NON-NLS-1$
+        this.jComboBoxFractionOrDegArcSec.setPreferredSize(new java.awt.Dimension(185, 20));
 
-		this.jLabelLongitude.setText("Longitude:"); //$NON-NLS-1$
+        this.jLabelLongitude.setText("Longitude:"); //$NON-NLS-1$
 
-		this.jLabelLatitude.setText("Latitude:"); //$NON-NLS-1$
+        this.jLabelLatitude.setText("Latitude:"); //$NON-NLS-1$
 
-		this.jLabelLongDeg.setText("Degrees"); //$NON-NLS-1$
+        this.jLabelLongDeg.setText("Degrees"); //$NON-NLS-1$
 
-		this.jTextFieldLongitude.addMouseListener(new java.awt.event.MouseAdapter() {
-			@Override
+        this.jTextFieldLongitude.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
 			public void mouseEntered(java.awt.event.MouseEvent evt) {
-				tooltipLongEnter(evt);
-			}
-			@Override
+                tooltipLongEnter(evt);
+            }
+            @Override
 			public void mouseExited(java.awt.event.MouseEvent evt) {
-				tooltipLongExit(evt);
-			}
-		});
+                tooltipLongExit(evt);
+            }
+        });
 
-		this.jTextFieldLatitude.addMouseListener(new java.awt.event.MouseAdapter() {
-			@Override
+        this.jTextFieldLatitude.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
 			public void mouseEntered(java.awt.event.MouseEvent evt) {
-				tooltiplatitudeEnter(evt);
-			}
-			@Override
+                tooltiplatitudeEnter(evt);
+            }
+            @Override
 			public void mouseExited(java.awt.event.MouseEvent evt) {
-				tooltipLatExit(evt);
-			}
-		});
+                tooltipLatExit(evt);
+            }
+        });
 
-		this.jLabelDate.setText("Date:"); //$NON-NLS-1$
+        this.jLabelDate.setText("Date:"); //$NON-NLS-1$
 
-		this.jLabelLatiDeg.setText("Degrees"); //$NON-NLS-1$
+        this.jLabelLatiDeg.setText("Degrees"); //$NON-NLS-1$
 
-		this.jComboBoxMonth.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Month", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" })); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$
+        this.jComboBoxMonth.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Month", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" })); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$
 
-		this.jComboBoxDay.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Day", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" })); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$ //$NON-NLS-16$ //$NON-NLS-17$ //$NON-NLS-18$ //$NON-NLS-19$ //$NON-NLS-20$ //$NON-NLS-21$ //$NON-NLS-22$ //$NON-NLS-23$ //$NON-NLS-24$ //$NON-NLS-25$ //$NON-NLS-26$ //$NON-NLS-27$ //$NON-NLS-28$ //$NON-NLS-29$ //$NON-NLS-30$ //$NON-NLS-31$ //$NON-NLS-32$
+        this.jComboBoxDay.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Day", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" })); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$ //$NON-NLS-16$ //$NON-NLS-17$ //$NON-NLS-18$ //$NON-NLS-19$ //$NON-NLS-20$ //$NON-NLS-21$ //$NON-NLS-22$ //$NON-NLS-23$ //$NON-NLS-24$ //$NON-NLS-25$ //$NON-NLS-26$ //$NON-NLS-27$ //$NON-NLS-28$ //$NON-NLS-29$ //$NON-NLS-30$ //$NON-NLS-31$ //$NON-NLS-32$
 
-		this.jButtonSearch.setText("Search"); //$NON-NLS-1$
-		this.jButtonSearch.addActionListener(new java.awt.event.ActionListener() {
-			@Override
+        this.jButtonSearch.setText("Display Sundial & Gnomon"); //$NON-NLS-1$
+        this.jButtonSearch.addActionListener(new java.awt.event.ActionListener() {
+            @Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jButtonSearchActionPerformed(evt);
-			}
-		});
+                jButtonSearchActionPerformed(evt);
+            }
+        });
 
-		javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(this.jPanelSundial);
-		this.jPanelSundial.setLayout(jPanel2Layout);
-		jPanel2Layout.setHorizontalGroup(
-				jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGap(0, 0, Short.MAX_VALUE)
-				);
-		jPanel2Layout.setVerticalGroup(
-				jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGap(0, 348, Short.MAX_VALUE)
-				);
+        this.jCheckBoxDST.setText("Daylight Savings Time?"); //$NON-NLS-1$
 
-		javax.swing.GroupLayout jPanelInfoLayout = new javax.swing.GroupLayout(this.jPanelInfo);
-		this.jPanelInfo.setLayout(jPanelInfoLayout);
-		jPanelInfoLayout.setHorizontalGroup(
-				jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelInfoLayout.createSequentialGroup()
-						.addContainerGap(171, Short.MAX_VALUE)
-						.addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-								.addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-										.addComponent(this.jLabelLatitude, javax.swing.GroupLayout.Alignment.TRAILING)
-										.addComponent(this.jLabelLongitude, javax.swing.GroupLayout.Alignment.TRAILING))
-										.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelInfoLayout.createSequentialGroup()
-												.addGap(24, 24, 24)
-												.addComponent(this.jLabelDate)))
-												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-												.addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-														.addComponent(this.jButtonSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addGroup(jPanelInfoLayout.createSequentialGroup()
-																.addComponent(this.jTextFieldLatitude, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-																.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(this.jLabelLatiDeg)
-																.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(this.jComboBoxFractionOrDegArcSec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-																.addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-																		.addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelInfoLayout.createSequentialGroup()
-																				.addComponent(this.jComboBoxMonth, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-																				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																				.addComponent(this.jComboBoxDay, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-																				.addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelInfoLayout.createSequentialGroup()
-																						.addComponent(this.jTextFieldLongitude, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-																						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																						.addComponent(this.jLabelLongDeg))))
-																						.addGap(120, 120, 120))
-																						.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelInfoLayout.createSequentialGroup()
-																								.addContainerGap()
-																								.addComponent(this.jPanelSundial, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																								.addContainerGap())
-				);
-		jPanelInfoLayout.setVerticalGroup(
-				jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(jPanelInfoLayout.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-								.addComponent(this.jLabelLatitude)
-								.addComponent(this.jTextFieldLatitude, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-								.addComponent(this.jLabelLatiDeg)
-								.addComponent(this.jComboBoxFractionOrDegArcSec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-										.addComponent(this.jTextFieldLongitude, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addComponent(this.jLabelLongitude)
-										.addComponent(this.jLabelLongDeg))
-										.addGap(18, 18, 18)
-										.addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(this.jLabelDate)
-												.addComponent(this.jComboBoxMonth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-												.addComponent(this.jComboBoxDay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-												.addGap(18, 18, 18)
-												.addComponent(this.jButtonSearch)
-												.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-												.addComponent(this.jPanelSundial, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-												.addContainerGap())
-				);
+        this.jCheckBoxEquator.setText("Are you at the equator?\n"); //$NON-NLS-1$
 
-		this.jMenuFile.setText("File"); //$NON-NLS-1$
+        this.jRadioButtonNorthHemi.setSelected(true);
+        this.jRadioButtonNorthHemi.setText("Northern Hemisphere"); //$NON-NLS-1$
 
-		this.jMenuItemPrint.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
-		this.jMenuItemPrint.setText("Print"); //$NON-NLS-1$
-		this.jMenuItemPrint.addActionListener(new java.awt.event.ActionListener() {
-			@Override
+        this.jRadioButtonSouthHemi.setText("Southern Hemisphere"); //$NON-NLS-1$
+
+        this.jRadioButtonNPole.setText("North Pole"); //$NON-NLS-1$
+
+        this.jRadioButtonSPole.setText("South Pole"); //$NON-NLS-1$
+
+        javax.swing.GroupLayout jPanelInfoLayout = new javax.swing.GroupLayout(this.jPanelInfo);
+        this.jPanelInfo.setLayout(jPanelInfoLayout);
+        jPanelInfoLayout.setHorizontalGroup(
+            jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelInfoLayout.createSequentialGroup()
+                .addContainerGap(72, Short.MAX_VALUE)
+                .addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(this.jLabelLatitude, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(this.jLabelLongitude, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelInfoLayout.createSequentialGroup()
+                        .addGap(24, 24, 24)
+                        .addComponent(this.jLabelDate)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanelInfoLayout.createSequentialGroup()
+                        .addComponent(this.jTextFieldLatitude, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(this.jLabelLatiDeg))
+                    .addGroup(jPanelInfoLayout.createSequentialGroup()
+                        .addComponent(this.jComboBoxMonth, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(this.jComboBoxDay, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanelInfoLayout.createSequentialGroup()
+                        .addComponent(this.jTextFieldLongitude, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(this.jLabelLongDeg))
+                    .addComponent(this.jButtonSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(42, 42, 42)
+                .addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanelInfoLayout.createSequentialGroup()
+                            .addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(this.jCheckBoxDST)
+                                .addComponent(this.jRadioButtonNorthHemi))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(this.jRadioButtonSouthHemi)
+                                .addComponent(this.jCheckBoxEquator)
+                                .addComponent(this.jRadioButtonSPole)))
+                        .addComponent(this.jComboBoxFractionOrDegArcSec, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(this.jRadioButtonNPole))
+                .addGap(88, 88, 88))
+            .addGroup(jPanelInfoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(this.jTabbedPaneDialGno)
+                .addContainerGap())
+        );
+        jPanelInfoLayout.setVerticalGroup(
+            jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelInfoLayout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(this.jLabelLatitude)
+                    .addComponent(this.jTextFieldLatitude, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(this.jLabelLatiDeg)
+                    .addComponent(this.jComboBoxFractionOrDegArcSec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(this.jTextFieldLongitude, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(this.jLabelLongitude)
+                    .addComponent(this.jLabelLongDeg)
+                    .addComponent(this.jCheckBoxDST)
+                    .addComponent(this.jCheckBoxEquator))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(this.jRadioButtonNorthHemi)
+                    .addComponent(this.jRadioButtonSouthHemi))
+                .addGap(2, 2, 2)
+                .addGroup(jPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(this.jLabelDate)
+                    .addComponent(this.jComboBoxMonth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(this.jComboBoxDay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(this.jRadioButtonNPole)
+                    .addComponent(this.jRadioButtonSPole))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(this.jButtonSearch)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(this.jTabbedPaneDialGno, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        this.buttonGroupHemisphere.add(this.jRadioButtonNorthHemi);
+        this.buttonGroupHemisphere.add(this.jRadioButtonSouthHemi);
+        this.buttonGroupPole.add(this.jRadioButtonNPole);
+        this.buttonGroupPole.add(this.jRadioButtonSPole);
+        this.gnomon = new JPanelBExt("gnomon"); //$NON-NLS-1$
+        this.sundial = new JPanelBExt("sundial"); //$NON-NLS-1$
+        this.jTabbedPaneDialGno.add("Horizontal Sundial", this.sundial); //$NON-NLS-1$
+        this.jTabbedPaneDialGno.add("Gnomon", this.gnomon); //$NON-NLS-1$
+
+        this.jMenuFile.setText("File"); //$NON-NLS-1$
+
+        this.jMenuItemPrint.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
+        this.jMenuItemPrint.setText("Print"); //$NON-NLS-1$
+        this.jMenuItemPrint.addActionListener(new java.awt.event.ActionListener() {
+            @Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jMenuItemPrintActionPerformed(evt);
-			}
-		});
-		this.jMenuFile.add(this.jMenuItemPrint);
+                jMenuItemPrintActionPerformed(evt);
+            }
+        });
+        this.jMenuFile.add(this.jMenuItemPrint);
 
-		this.jMenuBar.add(this.jMenuFile);
+        this.jMenuBar.add(this.jMenuFile);
 
-		this.jMenuHelp.setText("Help"); //$NON-NLS-1$
+        this.jMenuHelp.setText("Help"); //$NON-NLS-1$
 
-		this.jMenuItemAbout.setText("About"); //$NON-NLS-1$
-		this.jMenuItemAbout.addActionListener(new java.awt.event.ActionListener() {
-			@Override
+        this.jMenuItemAbout.setText("About"); //$NON-NLS-1$
+        this.jMenuItemAbout.addActionListener(new java.awt.event.ActionListener() {
+            @Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jMenuItemAboutActionPerformed(evt);
-			}
-		});
-		this.jMenuHelp.add(this.jMenuItemAbout);
+                jMenuItemAboutActionPerformed(evt);
+            }
+        });
+        this.jMenuHelp.add(this.jMenuItemAbout);
 
-		this.jMenuBar.add(this.jMenuHelp);
+        this.jMenuBar.add(this.jMenuHelp);
 
-		setJMenuBar(this.jMenuBar);
+        setJMenuBar(this.jMenuBar);
 
-		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-		getContentPane().setLayout(layout);
-		layout.setHorizontalGroup(
-				layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addComponent(this.jPanelInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-				);
-		layout.setVerticalGroup(
-				layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addComponent(this.jPanelInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-				);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(this.jPanelInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(this.jPanelInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
 
-		pack();
+        pack();
 	}
 
 	/**
@@ -312,7 +367,7 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 				job.print();
 			}
 			catch (PrinterException fail) {
-				System.out.println(fail);
+				JOptionPane.showMessageDialog(null, fail);
 			}
 		}
 	}
@@ -329,7 +384,9 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 		if (page > 0) {
 			return NO_SUCH_PAGE;
 		}
-		this.jPanelSundial.print(g);
+		//TODO I bet this is wrong...
+		this.gnomon.print(g);
+		this.sundial.print(g);
 		return PAGE_EXISTS;
 	}
 
@@ -363,23 +420,17 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	 */
 	private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {
 		
-		// TODO call checkValidMonthsAndDays method here
-		
-		//if (userError()) {
-			//JOptionPane.showMessageDialog(null, "Invalid input", null, JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
-		//}
-		//else {
+		if (userError()) {
+			JOptionPane.showMessageDialog(null, "Invalid input", null, JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+		}
+		else {
 			
 			// TODO call calculations method here
 			
-			// If calculations are all correct or something,
-			// draw time!
-			this.draw();
-		//}
+			// assume calculations are all correct
+			drawGnomonAndSundial();
+		}
 	}
-	
-	// TODO Error checking months and days method
-	// checkValidMonthsAndDays
 	
 	/**
 	 * Checks if any of the text fields or combo boxes are empty or they haven't been
@@ -387,12 +438,13 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	 * 
 	 * @return false if text fields are empty or combo boxes unchanged
 	 */
-	public boolean userError() {
-		return this.jTextFieldLatitude.getText().isEmpty() ||
+	@SuppressWarnings("static-method")
+	private boolean userError() {
+		return false /*|| this.jTextFieldLatitude.getText().isEmpty() ||
 				this.jTextFieldLongitude.getText().isEmpty() || 
 				this.jComboBoxMonth.getSelectedItem().equals("Month") || //$NON-NLS-1$
 				this.jComboBoxDay.getSelectedItem().equals("Day") || //$NON-NLS-1$
-				checkValidMonthsAndDays();
+				checkValidMonthsAndDays()*/;
 	}
 	
 	/**
@@ -414,69 +466,27 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 	 * @return month with a valid day
 	 */
 	private boolean checkValidMonthsAndDays() {
-		
-		String t = this.jComboBoxMonth.getSelectedItem().toString();
-		int u = Integer.parseInt(this.jComboBoxDay.getSelectedItem().toString());
-		System.out.println(t);
-		System.out.println(u);
-		return false;
+		String selectedMonth = this.jComboBoxMonth.getSelectedItem().toString();
+		int selectedDay = Integer.parseInt(this.jComboBoxDay.getSelectedItem().toString());
+		// TODO check to make sure
+		return true;
 	}
 	
-	// calculations method TODO
+	// calculations method here TODO
 	
 	/**
-	 * Draws out the sundial.
+	 * Draws out the sundial and gnomon.
 	 * 
 	 */
-	private void draw() {
-		Graphics2D gfx = (Graphics2D) this.jPanelSundial.getGraphics();
-		/*draw sundial lines*/
-		gfx.drawLine(0, 330, 736, 330);//6AM,6PM
-		gfx.drawLine(0,231,368,330);//7AM
-		gfx.drawLine(0, 118, 368, 330);//8AM
-		gfx.drawLine(0, -38, 368, 330);//9AM
-		gfx.drawLine(177, 0, 368, 330);//10AM
-		gfx.drawLine(280, 0, 368, 330);//11AM
-		gfx.drawLine(368, 0, 368, 330);//12PM
-		gfx.drawLine(456, 0, 368, 330);//1PM
-		gfx.drawLine(558, 0, 368, 330);//2PM
-		gfx.drawLine(736, -38, 368, 330);//3PM
-		gfx.drawLine(736, 118, 368, 330);//4PM
-		gfx.drawLine(736, 231, 368, 330);//5PM
-		
-		/*label sundial lines*/
-		gfx.drawString("6 AM", 2, 328);
-		gfx.drawString("7 AM", 2, 229);
-		gfx.drawString("8 AM", 2, 116);
-		gfx.drawString("9 AM", 58, 13);
-		gfx.drawString("10 AM", 186, 13);
-		gfx.drawString("11 AM", 287, 13);
-		gfx.drawString("12 PM", 370, 13);
-		gfx.drawString("1 PM", 458, 13);
-		gfx.drawString("2 PM", 560, 13);
-		gfx.drawString("3 PM", 705, 13);
-		gfx.drawString("4 PM", 705, 116);
-		gfx.drawString("5 PM", 705, 229);
-		gfx.drawString("6 PM", 705, 328);
-		
-		/*draw gnomon shadow*/
-		int[]xPoints = new int[4];
-		int[]yPoints = new int[4];
-		xPoints[0]= 368;
-		xPoints[1]= 368;
-		xPoints[2]= 558;
-		//xPoints[3]=
-		yPoints[0]= 330;
-		yPoints[1]= 0;
-		yPoints[2]= 0;
-		//yPoints[3]=
-		gfx.fillPolygon(xPoints,yPoints,3);
+	private void drawGnomonAndSundial() {
+		this.gnomon.paintMe();
+		this.sundial.paintMe();
 	}
 
 	/**
 	 * Main method.
 	 * 
-	 * @param args the command line arguments
+	 * @param args the command line arguments -not used
 	 */
 	public static void main(String args[]) {
 		/* Set the Nimbus look and feel */
@@ -509,23 +519,31 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 		});
 	}
 	// Variables declaration - do not modify//GEN-BEGIN:variables
-	private javax.swing.JButton jButtonSearch;
-	private javax.swing.JComboBox jComboBoxDay;
-	private javax.swing.JComboBox jComboBoxFractionOrDegArcSec;
-	private javax.swing.JComboBox jComboBoxMonth;
-	private javax.swing.JLabel jLabelDate;
-	private javax.swing.JLabel jLabelLatiDeg;
-	private javax.swing.JLabel jLabelLatitude;
-	private javax.swing.JLabel jLabelLongDeg;
-	private javax.swing.JLabel jLabelLongitude;
-	private javax.swing.JMenuBar jMenuBar;
-	private javax.swing.JMenu jMenuFile;
-	private javax.swing.JMenu jMenuHelp;
-	private javax.swing.JMenuItem jMenuItemAbout;
-	private javax.swing.JMenuItem jMenuItemPrint;
-	private javax.swing.JPanel jPanelInfo;
-	private javax.swing.JPanel jPanelSundial;
-	private javax.swing.JTextField jTextFieldLatitude;
-	private javax.swing.JTextField jTextFieldLongitude;
+    private javax.swing.ButtonGroup buttonGroupHemisphere;
+    private javax.swing.ButtonGroup buttonGroupPole;
+    private javax.swing.JButton jButtonSearch;
+    private javax.swing.JCheckBox jCheckBoxDST;
+    private javax.swing.JCheckBox jCheckBoxEquator;
+    private javax.swing.JComboBox jComboBoxDay;
+    private javax.swing.JComboBox jComboBoxFractionOrDegArcSec;
+    private javax.swing.JComboBox jComboBoxMonth;
+    private javax.swing.JLabel jLabelDate;
+    private javax.swing.JLabel jLabelLatiDeg;
+    private javax.swing.JLabel jLabelLatitude;
+    private javax.swing.JLabel jLabelLongDeg;
+    private javax.swing.JLabel jLabelLongitude;
+    private javax.swing.JMenuBar jMenuBar;
+    private javax.swing.JMenu jMenuFile;
+    private javax.swing.JMenu jMenuHelp;
+    private javax.swing.JMenuItem jMenuItemAbout;
+    private javax.swing.JMenuItem jMenuItemPrint;
+    private javax.swing.JPanel jPanelInfo;
+    private javax.swing.JRadioButton jRadioButtonNPole;
+    private javax.swing.JRadioButton jRadioButtonNorthHemi;
+    private javax.swing.JRadioButton jRadioButtonSPole;
+    private javax.swing.JRadioButton jRadioButtonSouthHemi;
+    private javax.swing.JTabbedPane jTabbedPaneDialGno;
+    private javax.swing.JTextField jTextFieldLatitude;
+    private javax.swing.JTextField jTextFieldLongitude;
 	// End of variables declaration//GEN-END:variables
 }
