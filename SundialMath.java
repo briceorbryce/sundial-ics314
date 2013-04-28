@@ -25,7 +25,7 @@ public class SundialMath
 	//phi = latitude of sundial location
 	public static double getAngleOfHour(double t, String phi)
 	{	
-		return Math.atan(Math.tan(t)*Math.sin(convertHourToDecimal(phi)));
+		return toDegrees.Math.atan(Math.tan(t)*Math.sin(convertHourToDecimal(phi)));
 	}
 	
 	//same as above, but takes a double for phi instead of a string
