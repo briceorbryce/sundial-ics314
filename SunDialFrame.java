@@ -526,10 +526,12 @@ public class SunDialFrame extends javax.swing.JFrame implements Printable {
 		try {
 			this.lat = Integer.parseInt(this.jTextFieldLatitude.getText());
 			this.lon = Integer.parseInt(this.jTextFieldLongitude.getText());
+			this.sm = Integer.parseInt(this.jTextFieldStdMeridian.getText());
 		}
 		catch (NumberFormatException fail) {
 			this.jTextFieldLatitude.setText(""); //$NON-NLS-1$
 			this.jTextFieldLongitude.setText(""); //$NON-NLS-1$
+			this.jTextFieldStdMeridian.setText(""); //$NON-NLS-1$
 			return true;
 		}
 		return false;
